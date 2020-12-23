@@ -47,9 +47,10 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
-            return redirect()->back()->withErrors([
-                'password' => '此頁閒置時間過長，請重新登入',
-            ]);
+            view()->replaceNamespace('errors', [
+                resource_path('views/errors')]);
+
+            return response()->view("errors::tokenMismatch");
         }
 
         return parent::render($request, $exception);
