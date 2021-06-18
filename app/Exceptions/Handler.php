@@ -53,6 +53,13 @@ class Handler extends ExceptionHandler
             return response()->view("errors::tokenMismatch");
         }
 
+        if ($exception instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
+            $langs = \Lang::get('passwords');
+            return redirect()->back()->withErrors([
+                'email' => $langs['throttled'],
+            ]);
+        }
+
         return parent::render($request, $exception);
     }
 }
