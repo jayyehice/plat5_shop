@@ -1,0 +1,56 @@
+private void loadEnvironmentVariablesFromFile(String path) {
+    def file = readFile(path)
+    file.split('\n').each { envLine ->
+        def (key, value) = envLine.tokenize('=')
+        env."${key}" = "${value}"
+    }
+}
+pipeline {
+    options {
+        buildDiscarder logRotator(
+            artifactDaysToKeepStr: '',
+            artifactNumToKeepStr: '',
+            daysToKeepStr: '14',
+            numToKeepStr: ''
+        )
+    }
+    parameters {
+        string name: 'NODE', trim: true
+        choice choices: ['testing', 'staging', 'production'], name: 'PLAT_ENV'
+        gitParameter branch: '', branchFilter: '.*', defaultValue: '', name: 'VERSION', quickFilterEnabled: false, selectedValue: 'NONE', sortMode: 'NONE', tagFilter: '*', type: 'PT_TAG'
+        string name: 'PLAT_REPLICAS', trim: true
+        string name: 'REDIS_REPLICAS', trim: true
+    }
+    environment {
+        gitCredentialsId = '09519a13-6423-47c6-86e7-d72a271378df'
+        REGISTRY = '192.168.110.142:5000'
+    }
+    stages {
+        stage('Init') {
+            agent { label '192.168.110.141' }
+            steps {
+                script {
+                    loadEnvironmentVariablesFromFile('.version')
+                    env.IMAGE_NAME = "${env.REGISTRY}/ntse:${env.GIT_COMMIT}"
+                }
+            }
+        }
+        stage('deploy') {
+            agent { label params.NODE }
+            steps {
+                script {
+                    dir('build/config') {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: "refs/tags/${CONFIG_VERSION}"]],
+                            doGenerateSubmoduleConfigurations: false,
+                            userRemoteConfigs: [[credentialsId: "${env.gitCredentialsId}", url: 'ssh://git@192.168.110.142:7999/ntse/config.git']]
+                        ])
+                    }
+                    sh "docker stack rm ${env.PLAT_ENV}_${env.PROJECT_KEY}"
+                    sh "docker stack deploy -c docker-compose.yml ${env.PLAT_ENV}_${env.PROJECT_KEY}"
+                }
+            }
+        }
+    }
+}
