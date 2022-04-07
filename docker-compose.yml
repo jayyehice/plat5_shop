@@ -1,0 +1,102 @@
+version: "3.8"
+services:
+  redis:
+    image: ${REGISTRY}/redis
+    deploy:
+      placement:
+        max_replicas_per_node: 1
+      resources:
+        limits:
+          memory: 2G
+      replicas: ${REDIS_REPLICAS}
+  plat5:
+    image: ${IMAGE_NAME}
+    environment:
+      - R_HOST=rscript
+    working_dir: /var/www/html/
+    ports:
+      - target: 8080
+        published: ${PLAT_PORT}
+        mode: host
+      - target: 8443
+        published: ${PLAT_SSL_PORT}
+        mode: host
+      - target: 8888
+        published: 3${PLAT_PORT}
+        mode: host
+    deploy:
+      placement:
+        max_replicas_per_node: 1
+      mode: replicated
+      replicas: ${PLAT_REPLICAS}
+      resources:
+        limits:
+          memory: 4G
+    volumes:
+      - plat_storage:/var/www/html/storage/app
+      - plat_log:/var/www/html/storage/logs
+    configs:
+      - source: plat_env
+        target: /var/www/html/.env
+        uid: "501"
+        gid: "502"
+      - source: nginx_conf
+        target: /etc/nginx/nginx.conf
+        gid: "0"
+        uid: "0"
+        mode: 0440
+      - source: nginx_ssl_crt
+        target: /etc/nginx/ssl/nginx.crt
+        gid: "0"
+        uid: "0"
+      - source: nginx_ssl_key
+        target: /etc/nginx/ssl/nginx.key
+        gid: "0"
+        uid: "0"
+      - source: php_config
+        target: /usr/local/etc/php/php.ini
+        gid: "0"
+        uid: "0"
+      - source: phpfpm_config
+        target: /usr/local/etc/php-fpm.d/www.conf
+        gid: "0"
+        uid: "0"
+    secrets:
+      - source: nginx_htpasswd
+        target: /etc/nginx/htpasswd
+        gid: "0"
+        uid: "0"
+      - source: code_server_config
+        target: /var/www/.config/code-server/config.yaml
+        gid: "502"
+        uid: "501"
+        mode: 0755
+volumes:
+  plat_storage:
+    driver_opts:
+      type: "nfs"
+      o: "nfsvers=4,addr=${PLAT_STORAGE_HOST},rw"
+      device: ":/${NAS_PATH}/storage/app/"
+  plat_log:
+    driver_opts:
+      type: "nfs"
+      o: "nfsvers=4,addr=${PLAT_STORAGE_HOST},rw"
+      device: ":/${NAS_PATH}/storage/logs/"
+configs:
+  plat_env:
+    file: ./build/config/${PLAT_ENV}
+  nginx_conf:
+    file: ./build/config/nginx_ssl.conf
+  nginx_ssl_crt:
+    file: ./build/config/ssl/nginx.crt
+  nginx_ssl_key:
+    file: ./build/config/ssl/nginx.key
+  php_config:
+    file: ./build/config/php.ini-${PLAT_ENV}
+  phpfpm_config:
+    file: ./build/config/www.conf
+secrets:
+  nginx_htpasswd:
+    file: ./build/config/htpasswd
+  code_server_config:
+    file: ./build/.config/code-server/config.yaml
