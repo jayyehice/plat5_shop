@@ -18,8 +18,8 @@ pipeline {
         string name: 'NODE', trim: true
         choice choices: ['testing', 'staging', 'production'], name: 'PLAT_ENV'
         gitParameter branch: '', branchFilter: '.*', defaultValue: '', name: 'VERSION', quickFilterEnabled: false, selectedValue: 'NONE', sortMode: 'NONE', tagFilter: '*', type: 'PT_TAG'
-        string name: 'PLAT_REPLICAS', trim: true
-        string name: 'REDIS_REPLICAS', trim: true
+        string name: 'PLAT_REPLICAS', defaultValue: '1', trim: true
+        string name: 'REDIS_REPLICAS', defaultValue: '1', trim: true
     }
     environment {
         gitCredentialsId = '09519a13-6423-47c6-86e7-d72a271378df'
@@ -30,8 +30,8 @@ pipeline {
             agent { label '192.168.110.141' }
             steps {
                 script {
-                    loadEnvironmentVariablesFromFile('.version')
-                    env.IMAGE_NAME = "${env.REGISTRY}/ntse:${env.GIT_COMMIT}"
+                    loadEnvironmentVariablesFromFile("env/${env.PLAT_ENV}")
+                    env.IMAGE_NAME = "${env.REGISTRY}/${env.PROJECT_KEY}:${env.GIT_COMMIT}"
                 }
             }
         }

@@ -24,7 +24,7 @@ pipeline {
         stage('Init') {
             steps {
                 script {
-                    loadEnvironmentVariablesFromFile('.version')
+                    loadEnvironmentVariablesFromFile("env/${env.PLAT_ENV}")
                     env.IMAGE_NAME = "${env.REGISTRY}/${env.PROJECT_KEY}:${env.GIT_COMMIT}"
                     dir('build/config') {
                         checkout([
