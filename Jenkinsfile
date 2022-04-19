@@ -19,6 +19,7 @@ pipeline {
         gitCredentialsId = '09519a13-6423-47c6-86e7-d72a271378df'
         BUILDER = '192.168.110.141'
         REGISTRY = '192.168.110.142:5000'
+        PLAT_ENV = 'production'
     }
     stages {
         stage('Init') {

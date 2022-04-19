@@ -6,6 +6,7 @@ private void loadEnvironmentVariablesFromFile(String path) {
     }
 }
 pipeline {
+    agent any
     options {
         buildDiscarder logRotator(
             artifactDaysToKeepStr: '',
@@ -15,28 +16,43 @@ pipeline {
         )
     }
     parameters {
-        string name: 'NODE', trim: true
+        choice choices: ['release', 'testing'], name: 'ENV_TYPE'
         choice choices: ['testing', 'staging', 'production'], name: 'PLAT_ENV'
-        gitParameter branch: '', branchFilter: '.*', defaultValue: '', name: 'VERSION', quickFilterEnabled: false, selectedValue: 'NONE', sortMode: 'NONE', tagFilter: '*', type: 'PT_TAG'
         string name: 'PLAT_REPLICAS', defaultValue: '1', trim: true
         string name: 'REDIS_REPLICAS', defaultValue: '1', trim: true
+        string(name: 'ACCESS_TOKEN', defaultValue: 'gBdVvAaveHzgfNWPyrQAPeAw2q1DiTTul6gHlkqE69y', description: '傳送到內部群組的Line notify token')
+        string(name: 'BOSS_ACCESS_TOKEN', defaultValue: 'Ymi4rFjv5MSWjHbFP5wya5QJIdxyXOPXIitNMsRH9nf', description: '傳送到含Boss群組的Line notify token')
     }
     environment {
         gitCredentialsId = '09519a13-6423-47c6-86e7-d72a271378df'
         REGISTRY = '192.168.110.142:5000'
+        BUILDER_NODE = '192.168.110.141'
     }
     stages {
         stage('Init') {
-            agent { label '192.168.110.141' }
+            agent { label env.BUILDER_NODE }
             steps {
                 script {
+                    switch (env.STATUS) {
+                        case '測試機':
+                            env.PLAT_ENV = 'testing'
+                            break
+                        case '模擬機':
+                            env.PLAT_ENV = 'staging'
+                            break
+                        case '正式機':
+                            env.PLAT_ENV = 'production'
+                            break
+                    }
+                    def issue = jiraGetIssue idOrKey: "${env.ISSUE_KEY}", site: 'JIRA'
+                    env.ENV_TYPE = issue.data.fields.issuetype.name
                     loadEnvironmentVariablesFromFile("env/${env.PLAT_ENV}")
                     env.IMAGE_NAME = "${env.REGISTRY}/${env.PROJECT_KEY}:${env.GIT_COMMIT}"
                 }
             }
         }
-        stage('deploy') {
-            agent { label params.NODE }
+        stage('Deploy') {
+            agent { label env.NODE }
             steps {
                 script {
                     dir('build/config') {
@@ -47,8 +63,20 @@ pipeline {
                             userRemoteConfigs: [[credentialsId: "${env.gitCredentialsId}", url: "ssh://git@192.168.110.142:7999/${env.PROJECT_KEY}/config.git"]]
                         ])
                     }
-                    sh "docker stack rm ${env.PLAT_ENV}_${env.PROJECT_KEY}"
-                    sh "docker stack deploy -c docker-compose.yml ${env.PLAT_ENV}_${env.PROJECT_KEY}"
+                    def composefile = env.PLAT_ENV == 'production' ? 'docker-stack.yml' : 'docker-compose.yml'
+                    sh "docker stack deploy -c ${composefile} ${env.ENV_TYPE}_${env.PROJECT_KEY}"
+                }
+            }
+        }
+        stage('Notify') {
+            agent { label env.BUILDER_NODE }
+            steps {
+                script {
+                    def token = env.PLAT_ENV == 'production' ? env.BOSS_ACCESS_TOKEN : env.ACCESS_TOKEN
+                    sh "curl -s -X POST \
+                        -H 'Authorization: Bearer ${token}' \
+                        -F 'message=[${env.PROJECT_NAME}] ${ISSUE_SUMMARY} \n http://jira.cere.ntnu.edu.tw:8080/browse/${env.ISSUE_KEY} \n 已部署至${env.STATUS} ${env.PLAT_URL}' \
+                        https://notify-api.line.me/api/notify"
                 }
             }
         }
