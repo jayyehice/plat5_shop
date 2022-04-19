@@ -11,13 +11,19 @@ services:
       replicas: ${REDIS_REPLICAS}
   plat5:
     image: ${IMAGE_NAME}
-    hostname: ${ENV_TYPE}_${PROJECT_KEY}
-    networks:
-      - web
-      - default
     environment:
       - R_HOST=rscript
     working_dir: /var/www/html/
+    ports:
+      - target: 8080
+        published: 80
+        mode: host
+      - target: 8443
+        published: 443
+        mode: host
+      - target: 8888
+        published: 8888
+        mode: host
     deploy:
       placement:
         max_replicas_per_node: 1
@@ -69,12 +75,12 @@ volumes:
   plat_storage:
     driver_opts:
       type: "nfs"
-      o: "addr=${PLAT_STORAGE_HOST},rw"
+      o: "nfsvers=4,addr=${PLAT_STORAGE_HOST},rw"
       device: ":/${NAS_PATH}/storage/app/"
   plat_log:
     driver_opts:
       type: "nfs"
-      o: "addr=${PLAT_STORAGE_HOST},rw"
+      o: "nfsvers=4,addr=${PLAT_STORAGE_HOST},rw"
       device: ":/${NAS_PATH}/storage/logs/"
 configs:
   plat_env:
@@ -102,8 +108,3 @@ secrets:
   code_server_config:
     name: ${PLAT_ENV}_${PROJECT_KEY}_code_server_config_${CONFIG_VERSION}
     file: ./build/.config/code-server/config.yaml
-
-networks:
-  web:
-    name: web
-    external: true
