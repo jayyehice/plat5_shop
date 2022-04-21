@@ -20,6 +20,7 @@ pipeline {
         BUILDER = '192.168.110.141'
         REGISTRY = '192.168.110.142:5000'
         PLAT_ENV = 'production'
+        PROJECT_KEY = 
     }
     stages {
         stage('Init') {
