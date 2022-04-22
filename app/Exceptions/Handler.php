@@ -47,6 +47,10 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
+            if ($request->expectsJson()) {
+                return response()->json([], 401);
+            }
+
             view()->replaceNamespace('errors', [
                 resource_path('views/errors')]);
 
