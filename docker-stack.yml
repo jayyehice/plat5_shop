@@ -93,9 +93,6 @@ configs:
   plat_env:
     name: ${PLAT_ENV}_${PROJECT_KEY}_plat_env_${CONFIG_VERSION}
     file: ./build/config/${PLAT_ENV}
-  phpfpm_config:
-    name: ${PLAT_ENV}_${PROJECT_KEY}_phpfpm_config_${CONFIG_VERSION}
-    file: ./build/config/www.conf
   nginx_conf:
     name: ${PLAT_ENV}_${PROJECT_KEY}_nginx_conf_${CONFIG_VERSION}
     file: ./build/config/nginx-ssl.conf
