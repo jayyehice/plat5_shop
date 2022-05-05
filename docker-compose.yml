@@ -38,10 +38,6 @@ services:
         target: /var/www/html/.env
         uid: "501"
         gid: "502"
-      - source: phpfpm_config
-        target: /usr/local/etc/php-fpm.d/www.conf
-        gid: "502"
-        uid: "501"
       - source: nginx_conf
         target: /etc/nginx/nginx.conf
         gid: "502"
