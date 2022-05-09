@@ -1,18 +1,14 @@
 FROM 192.168.110.142:5000/builder:1.1.1 as builder
 
-COPY ./ /build
+COPY ./ /app
 
-RUN --mount=type=tmpfs,target=/app \
-    mv /build/* /app/ && \
-    sh /docker-entrypoint.sh && \
-    mv /app/* /build
-
+RUN sh /docker-entrypoint.sh
 
 FROM 192.168.110.142:5000/lnp:1.2.0
 
 WORKDIR /var/www/html
 
-COPY --from=builder --chown=www-data /build /var/www/html
+COPY --from=builder --chown=www-data /app /var/www/html
 COPY --chown=www-data ./docker-entrypoint.sh /docker-entrypoint.sh
 
 # Make sure files/folders needed by the processes are accessable when they run under the www-data user
