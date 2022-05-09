@@ -1,4 +1,4 @@
-FROM 192.168.110.142:5000/builder:1.1.1 as builder
+FROM 192.168.110.142:5000/devops/builder:1.1.2 as builder
 
 COPY ./ /app
 
