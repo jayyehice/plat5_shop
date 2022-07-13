@@ -30,6 +30,10 @@ services:
       - plat_storage:/var/www/html/storage/app
       - plat_log:/var/www/html/storage/logs
     configs:
+      - source: supervisord_config
+        target: /etc/supervisor/conf.d/supervisord.conf
+        gid: "502"
+        uid: "501"
       - source: plat_env
         target: /var/www/html/.env
         uid: "501"
@@ -67,40 +71,35 @@ services:
         mode: 0755
 volumes:
   plat_storage:
-    driver_opts:
-      type: "nfs"
-      o: "addr=${PLAT_STORAGE_HOST},rw"
-      device: ":/${NAS_PATH}/storage/app/"
   plat_log:
-    driver_opts:
-      type: "nfs"
-      o: "addr=${PLAT_STORAGE_HOST},rw"
-      device: ":/${NAS_PATH}/storage/logs/"
 configs:
+  supervisord_config:
+    name: ${ENV_TYPE}_${PROJECT_KEY}_supervisord_config_${CONFIG_VERSION}
+    file: ./build/config/supervisor/conf.d/supervisord.conf
   plat_env:
-    name: ${PLAT_ENV}_${PROJECT_KEY}_plat_env_${CONFIG_VERSION}
+    name: ${ENV_TYPE}_${PROJECT_KEY}_plat_env_${CONFIG_VERSION}
     file: ./build/config/${PLAT_ENV}
   nginx_conf:
-    name: ${PLAT_ENV}_${PROJECT_KEY}_nginx_conf_${CONFIG_VERSION}
+    name: ${ENV_TYPE}_${PROJECT_KEY}_nginx_conf_${CONFIG_VERSION}
     file: ./build/config/nginx-ssl.conf
   nginx_ssl_crt:
-    name: ${PLAT_ENV}_${PROJECT_KEY}_nginx_ssl_crt_${CONFIG_VERSION}
+    name: ${ENV_TYPE}_${PROJECT_KEY}_nginx_ssl_crt_${CONFIG_VERSION}
     file: ./build/config/ssl/nginx.crt
   nginx_ssl_key:
-    name: ${PLAT_ENV}_${PROJECT_KEY}_nginx_ssl_key_${CONFIG_VERSION}
+    name: ${ENV_TYPE}_${PROJECT_KEY}_nginx_ssl_key_${CONFIG_VERSION}
     file: ./build/config/ssl/nginx.key
   php_config:
-    name: ${PLAT_ENV}_${PROJECT_KEY}_php_config_${CONFIG_VERSION}
+    name: ${ENV_TYPE}_${PROJECT_KEY}_php_config_${CONFIG_VERSION}
     file: ./build/config/php.ini-${PLAT_ENV}
   phpfpm_config:
-    name: ${PLAT_ENV}_${PROJECT_KEY}_phpfpm_config_${CONFIG_VERSION}
+    name: ${ENV_TYPE}_${PROJECT_KEY}_phpfpm_config_${CONFIG_VERSION}
     file: ./build/config/www.conf
 secrets:
   nginx_htpasswd:
-    name: ${PLAT_ENV}_${PROJECT_KEY}_nginx_htpasswd_${CONFIG_VERSION}
+    name: ${ENV_TYPE}_${PROJECT_KEY}_nginx_htpasswd_${CONFIG_VERSION}
     file: ./build/config/htpasswd
   code_server_config:
-    name: ${PLAT_ENV}_${PROJECT_KEY}_code_server_config_${CONFIG_VERSION}
+    name: ${ENV_TYPE}_${PROJECT_KEY}_code_server_config_${CONFIG_VERSION}
     file: ./build/.config/code-server/config.yaml
 
 networks:

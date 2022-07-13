@@ -24,9 +24,10 @@ pipeline {
         string(name: 'BOSS_ACCESS_TOKEN', defaultValue: 'Ymi4rFjv5MSWjHbFP5wya5QJIdxyXOPXIitNMsRH9nf', description: '傳送到含Boss群組的Line notify token')
     }
     environment {
-        gitCredentialsId = '09519a13-6423-47c6-86e7-d72a271378df'
+        gitCredentialsId = 'b1a0e063-e6a0-4219-ba6f-e693bed1c895'
         REGISTRY = '192.168.110.142:5000'
         BUILDER_NODE = '192.168.110.141'
+        PROJECT_KEY = ''
     }
     stages {
         stage('Init') {
