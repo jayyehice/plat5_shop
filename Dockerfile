@@ -1,10 +1,12 @@
-FROM 192.168.110.142:5000/builder:1.1.2 as builder
+ARG REGISTRY=registry.e-gps.tw
+FROM ${REGISTRY}/builder:1.1.2 as builder
 
 COPY ./ /app
 
 RUN sh /docker-entrypoint.sh
 
-FROM 192.168.110.142:5000/lnp:1.2.0
+ARG REGISTRY=registry.e-gps.tw
+FROM ${REGISTRY}/lnp:1.2.0
 
 WORKDIR /var/www/html
 

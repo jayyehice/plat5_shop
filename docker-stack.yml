@@ -78,14 +78,14 @@ services:
 volumes:
   plat_storage:
     driver_opts:
-      type: "nfs"
-      o: "nfsvers=4,addr=${PLAT_STORAGE_HOST},rw"
-      device: ":/${NAS_PATH}/storage/app/"
+      type: "cifs"
+      o: "addr=${PLAT_STORAGE_HOST},username=${PLAT_STORAGE_USER},password=${PLAT_STORAGE_PW},file_mode=0777,dir_mode=0777"
+      device: "//${PLAT_STORAGE_HOST}/${PLAT_STORAGE_PATH}/storage/app"
   plat_log:
     driver_opts:
-      type: "nfs"
-      o: "nfsvers=4,addr=${PLAT_STORAGE_HOST},rw"
-      device: ":/${NAS_PATH}/storage/logs/"
+      type: "cifs"
+      o: "addr=${PLAT_STORAGE_HOST},username=${PLAT_STORAGE_USER},password=${PLAT_STORAGE_PW},file_mode=0777,dir_mode=0777"
+      device: "//${PLAT_STORAGE_HOST}/${PLAT_STORAGE_PATH}/storage/logs"
 configs:
   supervisord_config:
     name: ${ENV_TYPE}_${PROJECT_KEY}_supervisord_config_${CONFIG_VERSION}

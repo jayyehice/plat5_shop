@@ -18,7 +18,7 @@ pipeline {
     environment {
         gitCredentialsId = 'b1a0e063-e6a0-4219-ba6f-e693bed1c895'
         BUILDER = '192.168.110.141'
-        REGISTRY = '192.168.110.142:5000'
+        REGISTRY = 'registry.e-gps.tw'
         PROJECT_KEY = ''
     }
     stages {
