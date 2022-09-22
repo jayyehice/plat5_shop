@@ -1,0 +1,43 @@
+kind: pipeline
+type: docker
+name: build image
+
+steps:
+  - name: install
+    image: registry.e-gps.tw/devops/builder:v1.1.3
+    commands:
+      - composer install --optimize-autoloader --no-dev
+      - php artisan vendor:publish --force --tag=public
+      - php artisan vendor:publish --tag=setting
+      - php artisan config:cache
+      - php artisan view:cache
+      - php artisan storage:link
+
+  - name: build production
+    image: plugins/docker
+    settings:
+      repo: registry.e-gps.tw/${DRONE_REPO_NAMESPACE,,}
+      tags: ${DRONE_SEMVER}
+      purge: false
+      custom_dns: 192.168.0.27
+    when:
+      event:
+        - tag
+
+  - name: build testing
+    image: plugins/docker
+    settings:
+      repo: registry.e-gps.tw/${DRONE_REPO_NAMESPACE,,}
+      tags: ${DRONE_BRANCH##testing\/}
+      purge: false
+      custom_dns: 192.168.0.27
+    when:
+      branch:
+        - testing/*
+
+trigger:
+  ref:
+    - refs/heads/dev
+    - refs/heads/testing/*
+    - refs/tags/**
+    - refs/pull-requests/**
