@@ -9,14 +9,11 @@ steps:
       - composer install --optimize-autoloader --no-dev
       - php artisan vendor:publish --force --tag=public
       - php artisan vendor:publish --tag=setting
-      - php artisan config:cache
-      - php artisan view:cache
-      - php artisan storage:link
 
   - name: build production
     image: plugins/docker
     settings:
-      repo: registry.e-gps.tw/${DRONE_REPO_NAMESPACE,,}
+      repo: registry.e-gps.tw/${DRONE_REPO_NAMESPACE,,}/plat5
       tags: ${DRONE_SEMVER}
       purge: false
       custom_dns: 192.168.0.27
@@ -27,7 +24,7 @@ steps:
   - name: build testing
     image: plugins/docker
     settings:
-      repo: registry.e-gps.tw/${DRONE_REPO_NAMESPACE,,}
+      repo: registry.e-gps.tw/${DRONE_REPO_NAMESPACE,,}/plat5
       tags: ${DRONE_BRANCH##testing\/}
       purge: false
       custom_dns: 192.168.0.27
