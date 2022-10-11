@@ -48,7 +48,10 @@ pipeline {
                     def issue = jiraGetIssue idOrKey: "${env.ISSUE_KEY}", site: 'JIRA'
                     env.ENV_TYPE = issue.data.fields.issuetype.name
                     loadEnvironmentVariablesFromFile("env/${env.PLAT_ENV}")
-                    env.IMAGE_NAME = "${env.REGISTRY}/${env.PROJECT_KEY}:${env.GIT_COMMIT}"
+                    def tag = env.ENV_TYPE.toLowerCase() == 'release'
+                        ? sh(returnStdout: true, script: "git tag --contains | head -1").trim()[1..-1]
+                        : env.ISSUE_KEY
+                    env.IMAGE_NAME = "${env.REGISTRY}/${env.PROJECT_KEY}/plat5:${tag}"
                 }
             }
         }
