@@ -4,9 +4,18 @@ name: build image
 
 steps:
   - name: install
-    image: registry.e-gps.tw/dev/builder:php7.4-npm7
+    image: registry.e-gps.tw/dev/builder:php7.4
     commands:
       - composer install --optimize-autoloader --no-dev
+
+  # - name: npm build
+  #   image: registry.e-gps.tw/node:16.10.0-bullseye
+  #   commands:
+  #   - npm run build --path=$(pwd)/vendor/cere/project
+
+  - name: artisan publish
+    image: registry.e-gps.tw/dev/builder:php7.4
+    commands:
       - php artisan vendor:publish --force --tag=public
       - php artisan vendor:publish --tag=setting
 
@@ -34,7 +43,7 @@ steps:
 
 trigger:
   ref:
-    - refs/heads/dev
+    # - refs/heads/dev
     - refs/heads/testing/*
     - refs/tags/**
     - refs/pull-requests/**
