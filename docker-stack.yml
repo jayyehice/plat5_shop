@@ -11,6 +11,8 @@ services:
       replicas: ${REDIS_REPLICAS}
   plat5:
     image: ${IMAGE_NAME}
+    labels:
+      - io.portainer.accesscontrol.public
     environment:
       - R_HOST=rscript
     working_dir: /var/www/html/

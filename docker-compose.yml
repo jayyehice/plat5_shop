@@ -11,6 +11,8 @@ services:
       replicas: ${REDIS_REPLICAS}
   plat5:
     image: ${IMAGE_NAME}
+    labels:
+      - io.portainer.accesscontrol.public
     hostname: ${ENV_TYPE}_${PROJECT_KEY}
     networks:
       - web
