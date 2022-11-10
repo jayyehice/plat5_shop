@@ -17,3 +17,4 @@ use App\Http\Controllers\ProductsController;
 
 Route::get('/getAllProducts', [ProductsController::class, 'getAllProducts']);
 
+Route::view('/', 'index');
