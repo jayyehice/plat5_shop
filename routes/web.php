@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\TypesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +15,11 @@ use App\Http\Controllers\ProductsController;
 |
 */
 
-
-Route::get('/getAllProducts', [ProductsController::class, 'getAllProducts']);
+Route::group(['prefix'=>'products'], function(){
+    Route::get('getAllProducts', [ProductsController::class, 'getAllProducts']);
+    Route::get('searchProducts', [ProductsController::class, 'searchProducts']);
+    Route::get('getAllTypes', [TypesController::class, 'getAllTypes']);
+    Route::get('filterProducts', [TypesController::class, 'filterProducts']);
+});
 
 Route::view('/', 'index');

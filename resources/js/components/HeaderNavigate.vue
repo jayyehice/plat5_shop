@@ -20,18 +20,6 @@
                         <v-icon>mdi-account</v-icon>
                     </v-btn>
                 </v-col>
-                <v-col cols="2" class="d-flex ml-2">
-                    <v-text-field
-                        class="mr-2"
-                        dense
-                        flat
-                        hide-details
-                        rounded
-                        solo-inverted
-                    >
-                    </v-text-field>
-                    <v-btn> 商品搜尋 </v-btn>
-                </v-col>
             </v-row>
         </v-container>
     </v-app-bar>

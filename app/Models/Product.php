@@ -9,4 +9,9 @@ class Product extends Model
 
     protected $table = 'products';
     public $timestamps = false;
+
+    public function types()
+    {
+        return $this->belongsToMany(Type::class);
+    }
 }

@@ -4,20 +4,41 @@
             <products-filter
                 title="篩選條件"
                 :options="options"
-                :checkboxes="checkboxes"
+                :filterProducts="filterProducts"
+                :default_options="default_options"
             >
             </products-filter>
 
             <v-col cols="10">
-                <v-sheet
-                    min-height="70vh"
-                    rounded="lg"
-                    class="d-flex flex-wrap pa-2"
-                >
+                <v-sheet class="pa-4 pb-0">
+                    <v-row>
+                        <v-spacer></v-spacer>
+                        <v-col cols="3" class="d-flex">
+                            <v-text-field
+                                class="mr-2"
+                                dense
+                                flat
+                                hide-details
+                                rounded
+                                solo-inverted
+                                v-model="keyword"
+                                placeholder="請輸入關鍵字"
+                                @keyup.enter="searchProducts"
+                            >
+                            </v-text-field>
+                            <v-btn @click="searchProducts"> 商品搜尋 </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-sheet>
+                <v-sheet min-height="70vh" class="d-flex flex-wrap pa-2">
+                    <div class="text-overline" v-if="products.length == 0">
+                        無相關產品，請重新搜尋
+                    </div>
+
                     <v-card
                         v-for="(product, index) in products"
                         :key="index"
-                        class="justify-space-between align-self-center ma-2"
+                        class="justify-space-between align-self-start ma-2"
                         max-width="344"
                         outlined
                     >
@@ -62,30 +83,59 @@ export default {
     components: { productsFilter },
     data: () => ({
         products: [],
-        types: [
-            { id: 1, name: '紅色', kind: '顏色' },
-            { id: 2, name: '黃色', kind: '顏色' },
-            { id: 3, name: '甜', kind: '口味' },
-            { id: 4, name: '酸', kind: '口味' },
-        ], //之後會改用ajax，取得商品分類table的資料
-        checkboxes: {},
+        default_options: {},
         options: {},
+        keyword: '',
     }),
+    methods: {
+        getFilterOptions(types) {
+            let options = {};
+            types.forEach((type) => {
+                options[type.kind] = options[type.kind] || [];
+                options[type.kind].push(type.name);
+            });
+            return options;
+        },
+        searchProducts() {
+            axios
+                .get(`products/searchProducts?keyword=${this.keyword}`)
+                .then((response) => {
+                    this.products = response.data.products;
+
+                    //有搜尋到商品時，才更新篩選的選項!
+                    response.data.products.length != 0
+                        ? (this.options = this.getFilterOptions(
+                              response.data.types
+                          ))
+                        : null;
+                });
+        },
+        filterProducts(selected_types) {
+            let query_string = '';
+            selected_types.forEach((type) => {
+                query_string += `types[]=${type}&`;
+            });
+            axios
+                .get(`products/filterProducts?${query_string}`)
+                .then((response) => {
+                    this.products = response.data.products;
+                    this.keyword = '';
+                });
+        },
+    },
     mounted() {
         axios
-            .get('getAllProducts')
+            .get('products/getAllProducts')
             .then((response) => (this.products = response.data.products));
 
-        //篩選條件
-        let options = {};
-        let checkboxes = {};
-        this.types.forEach((type) => {
-            options[type.kind] = options[type.kind] || [];
-            options[type.kind].push(type.name);
-            checkboxes[type.name] = true;
-        });
-        this.options = options;
-        this.checkboxes = checkboxes;
+        axios
+            .get('products/getAllTypes')
+            .then(
+                (response) =>
+                    (this.default_options = this.getFilterOptions(
+                        response.data.types
+                    ))
+            );
     },
 };
 </script>
