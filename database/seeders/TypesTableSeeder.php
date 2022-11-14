@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\Type;
 
 class TypesTableSeeder extends Seeder
@@ -38,8 +37,6 @@ class TypesTableSeeder extends Seeder
             ]
         ];
 
-        foreach($types as $type){
-            Type::create($type);
-        }
+        Type::createMany($types);
     }
 }

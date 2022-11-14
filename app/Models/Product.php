@@ -7,7 +7,6 @@ use App\Models\Type;
 
 class Product extends Model
 {
-
     protected $table = 'products';
     public $timestamps = false;
 

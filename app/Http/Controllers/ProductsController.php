@@ -13,31 +13,29 @@ class ProductsController extends Controller
         $products = Product::all();
         return ['products' => $products];
     }
-    
 
     public function getAllTypes()
     {
         $types = Type::all();
         return ['types' => $types];
-    }
+    }    
     
-    
-    public function searchProducts(Request $request)
+    public function searchProducts()
     {
-        $keyword = $request->keyword;
-        $querys = Product::where('name', 'like', "%".$keyword."%")->orwhere('description', 'like', '%'.$keyword.'%')->get();
+        $keyword = request('keyword');
+        $query_products = Product::where('name', 'like', "%".$keyword."%")->orwhere('description', 'like', '%'.$keyword.'%')->get();
         $products = [];
         $types = [];
 
-        foreach($querys as $query){
+        foreach($query_products as $product){
 
-            foreach($query->types as $type){
+            foreach($product->types as $type){
                 unset($type["pivot"]);
                 array_push($types, $type);
             }
 
-            unset($query["types"]);
-            array_push($products, $query);
+            unset($product["types"]);
+            array_push($products, $product);
 
         }
 
@@ -47,11 +45,9 @@ class ProductsController extends Controller
         return ['products' => $products, 'types' => $types];
     }
 
-
-
-    public function filterProducts(Request $request)
+    public function filterProducts()
     {
-        $type_parameters = $request->types;
+        $type_parameters = request('types');
         $querys = Type::query();
         $products = [];
         $types = [];
@@ -60,18 +56,17 @@ class ProductsController extends Controller
             $querys = $querys->orwhere('name', $type_parameter);
         }
 
-        $querys = $querys->get();
+        $query_types = $querys->get();
 
-
-        foreach($querys as $query){
-
-            foreach($query->products as $product){
+        foreach($query_types as $type){
+            
+            foreach($type->products as $product){
                 unset($product["pivot"]);
                 array_push($products, $product);
             }
 
-            unset($query["products"]);
-            array_push($types, $query);
+            unset($type["products"]);
+            array_push($types, $type);
         }
 
         $products = array_diff_assoc ( $products, array_unique($products) );

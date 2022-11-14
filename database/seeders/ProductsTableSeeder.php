@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-// use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Type;
 
@@ -70,6 +69,5 @@ class ProductsTableSeeder extends Seeder
         foreach($products as $product){
             Product::create($product['information'])->types()->attach($product['types']);
         }
-
     }
 }
