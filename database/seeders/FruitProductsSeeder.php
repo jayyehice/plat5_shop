@@ -14,9 +14,8 @@ class FruitProductsSeeder extends Seeder
     public function run()
     {
         $this->call([
-            ProductsTableSeeder::class,
             TypesTableSeeder::class,
-            ProductTypeTableSeeder::class,
+            ProductsTableSeeder::class
         ]);
     }
 }

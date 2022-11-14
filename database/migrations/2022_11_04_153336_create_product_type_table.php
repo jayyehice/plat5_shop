@@ -15,10 +15,8 @@ class CreateProductTypeTable extends Migration
     {
         Schema::create('product_type', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('products');
-            $table->unsignedInteger('type_id');
-            $table->foreign('type_id')->references('id')->on('types');
+            $table->integer('product_id');
+            $table->integer('type_id');
         });
     }
 

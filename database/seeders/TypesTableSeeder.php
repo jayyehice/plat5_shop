@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Type;
 
 class TypesTableSeeder extends Seeder
 {
@@ -14,7 +15,7 @@ class TypesTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('types')->insert([
+        $types = [
             [
                 'name'=> '紅色',
                 'kind'=> '顏色'
@@ -35,6 +36,10 @@ class TypesTableSeeder extends Seeder
                 'name'=> '酸',
                 'kind'=> '口味'
             ]
-        ]);
+        ];
+
+        foreach($types as $type){
+            Type::create($type);
+        }
     }
 }
