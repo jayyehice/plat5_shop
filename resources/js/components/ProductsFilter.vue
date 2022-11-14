@@ -65,7 +65,7 @@ export default {
         checkbox_disable(kind, type) {
             //勾選選項剩一個時，不能再取消勾選
             return (
-                this.selected_options[kind].includes(type) &&
+                (this.selected_options[kind].includes(type) || false) &&
                 this.selected_options[kind].length < 2
             );
         },
