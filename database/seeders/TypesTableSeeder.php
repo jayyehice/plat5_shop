@@ -37,6 +37,8 @@ class TypesTableSeeder extends Seeder
             ]
         ];
 
-        Type::createMany($types);
+        foreach($types as $type){
+            Type::create($type);
+        }
     }
 }

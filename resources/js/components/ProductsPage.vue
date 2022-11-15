@@ -1,12 +1,8 @@
 <template>
     <v-container>
         <v-row>
-            <products-filter
-                title="篩選條件"
-                :options="options"
-                :filterProducts="filterProducts"
-                :default_options="default_options"
-            >
+            <products-filter title="篩選條件" :options="options" :default_options="default_options"
+                @filter-products="filterProducts">
             </products-filter>
 
             <v-col cols="10">
@@ -14,17 +10,8 @@
                     <v-row>
                         <v-spacer></v-spacer>
                         <v-col cols="3" class="d-flex">
-                            <v-text-field
-                                class="mr-2"
-                                dense
-                                flat
-                                hide-details
-                                rounded
-                                solo-inverted
-                                v-model="keyword"
-                                placeholder="請輸入關鍵字"
-                                @keyup.enter="searchProducts"
-                            >
+                            <v-text-field class="mr-2" dense flat hide-details rounded solo-inverted v-model="keyword"
+                                placeholder="請輸入關鍵字" @keyup.enter="searchProducts">
                             </v-text-field>
                             <v-btn @click="searchProducts"> 商品搜尋 </v-btn>
                         </v-col>
@@ -35,13 +22,8 @@
                         無相關產品，請重新搜尋
                     </div>
 
-                    <v-card
-                        v-for="(product, index) in products"
-                        :key="index"
-                        class="justify-space-between align-self-start ma-2"
-                        max-width="344"
-                        outlined
-                    >
+                    <v-card v-for="(product, index) in products" :key="index"
+                        class="justify-space-between align-self-start ma-2" max-width="344" outlined>
                         <v-list-item three-line>
                             <v-list-item-content>
                                 <div class="text-overline mb-4">OVERLINE</div>
@@ -57,9 +39,7 @@
                             </v-list-item-content>
 
                             <v-list-item-avatar tile size="80" color="grey">
-                                <v-img
-                                    :src="`./img/${product.name}.jpg`"
-                                ></v-img>
+                                <v-img :src="`./img/${product.name}.jpg`"></v-img>
                             </v-list-item-avatar>
                         </v-list-item>
 
@@ -97,45 +77,30 @@ export default {
             return options;
         },
         searchProducts() {
-            axios
-                .get(`products/searchProducts?keyword=${this.keyword}`)
-                .then((response) => {
-                    this.products = response.data.products;
-
-                    //有搜尋到商品時，才更新篩選的選項!
-                    response.data.products.length != 0
-                        ? (this.options = this.getFilterOptions(
-                              response.data.types
-                          ))
-                        : null;
-                });
+            axios.get(`products/searchProducts?keyword=${this.keyword}`).then((response) => {
+                this.products = response.data.products;
+                //有搜尋到商品時，才更新篩選的選項!
+                response.data.products.length != 0 ? (this.options = this.getFilterOptions(response.data.types)) : null;
+            });
         },
         filterProducts(selected_types) {
             let query_string = '';
             selected_types.forEach((type) => {
                 query_string += `types[]=${type}&`;
             });
-            axios
-                .get(`products/filterProducts?${query_string}`)
-                .then((response) => {
-                    this.products = response.data.products;
-                    this.keyword = '';
-                });
+            axios.get(`products/filterProducts?${query_string}`).then((response) => {
+                this.products = response.data.products;
+                this.keyword = '';
+            });
         },
     },
     mounted() {
-        axios
-            .get('products/getAllProducts')
-            .then((response) => (this.products = response.data.products));
-
-        axios
-            .get('products/getAllTypes')
-            .then(
-                (response) =>
-                    (this.default_options = this.getFilterOptions(
-                        response.data.types
-                    ))
-            );
+        axios.get('products/getAllProducts').then((response) => {
+            this.products = response.data.products;
+        });
+        axios.get('products/getAllTypes').then((response) => {
+            this.default_options = this.getFilterOptions(response.data.types);
+        });
     },
 };
 </script>

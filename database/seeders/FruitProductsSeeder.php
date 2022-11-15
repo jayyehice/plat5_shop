@@ -15,7 +15,8 @@ class FruitProductsSeeder extends Seeder
     {
         $this->call([
             TypesTableSeeder::class,
-            ProductsTableSeeder::class
+            ProductsTableSeeder::class,
+            ProductTypesTableSeeder::class
         ]);
     }
 }
