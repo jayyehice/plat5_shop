@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use App\Models\Product;
 use App\Models\Type;
 
@@ -23,55 +24,32 @@ class ProductsController extends Controller
     public function searchProducts()
     {
         $keyword = request('keyword');
-        $query_products = Product::where('name', 'like', "%".$keyword."%")->orwhere('description', 'like', '%'.$keyword.'%')->get();
-        $products = [];
-        $types = [];
+        $products = Product::where('name', 'like', "%".$keyword."%")->orwhere('description', 'like', '%'.$keyword.'%')->get();
+    
+        $types = collect($products)->map(function($value){
+            return $value->types;
+        });
+        $types = collect($types)->collapse()->map(function ($value) {
+            return collect($value)->forget('pivot');
+        })->unique()->values()->all();
 
-        foreach($query_products as $product){
-
-            foreach($product->types as $type){
-                unset($type["pivot"]);
-                array_push($types, $type);
-            }
-
-            unset($product["types"]);
-            array_push($products, $product);
-
-        }
-
-        $types = array_unique($types);
-        $types = array_values($types);
+        $products = collect($products)->map(function ($product) {
+            return collect($product)->forget('types');
+        })->all();
 
         return ['products' => $products, 'types' => $types];
     }
 
     public function filterProducts()
     {
-        $type_parameters = request('types');
-        $querys = Type::query();
-        $products = [];
-        $types = [];
+        $products = collect(request('types'))->map(function ($type){
+            return Product::whereHas('types', function($query) use($type){
+                $query->where('name', $type);
+            })->get();
+        })->collapse();
 
-        foreach($type_parameters as $type_parameter){
-            $querys = $querys->orwhere('name', $type_parameter);
-        }
+        $products = $products->diffAssoc($products->unique())->values()->all();
 
-        $query_types = $querys->get();
-
-        foreach($query_types as $type){
-            
-            foreach($type->products as $product){
-                unset($product["pivot"]);
-                array_push($products, $product);
-            }
-
-            unset($type["products"]);
-            array_push($types, $type);
-        }
-
-        $products = array_diff_assoc ( $products, array_unique($products) );
-        $products = array_values($products);
-
-        return ['products' => $products, 'types' => $types];
+        return ['products' => $products];
     }
 }

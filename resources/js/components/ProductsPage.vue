@@ -77,18 +77,14 @@ export default {
             return options;
         },
         searchProducts() {
-            axios.get(`products/searchProducts?keyword=${this.keyword}`).then((response) => {
+            axios.get('products/searchProducts', { params: { keyword: this.keyword } }).then((response) => {
                 this.products = response.data.products;
                 //有搜尋到商品時，才更新篩選的選項!
-                response.data.products.length != 0 ? (this.options = this.getFilterOptions(response.data.types)) : null;
+                response.data.products.length != 0 && (this.options = this.getFilterOptions(response.data.types));
             });
         },
         filterProducts(selected_types) {
-            let query_string = '';
-            selected_types.forEach((type) => {
-                query_string += `types[]=${type}&`;
-            });
-            axios.get(`products/filterProducts?${query_string}`).then((response) => {
+            axios.get('products/filterProducts', { params: { types: selected_types } }).then((response) => {
                 this.products = response.data.products;
                 this.keyword = '';
             });

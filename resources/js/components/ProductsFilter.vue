@@ -53,7 +53,7 @@ export default {
             return (this.selected_options[kind].includes(type) || false) && this.selected_options[kind].length < 2;
         },
         select_all(kind) {
-            this.selected_kinds[kind] ? (this.selected_options[kind] = this.default_options[kind]) : null;
+            this.selected_kinds[kind] && (this.selected_options[kind] = this.default_options[kind]);
         },
     },
     watch: {
