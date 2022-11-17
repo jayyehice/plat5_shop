@@ -11,10 +11,11 @@ Vue.config.productionTip = false;
 Vue.use(VueRouter);
 
 const routes = [
-    { path: '/', component: productsPage },
-    { path: '/login', component: login },
-    { path: '/register', component: register },
-    { path: '/personalManage', component: personalManage },
+    { path: '/', component: productsPage, meta: { keepAlive: true } },
+    { path: '/products', component: productsPage, meta: { keepAlive: true } },
+    { path: '/login', component: login, meta: { keepAlive: true } },
+    { path: '/register', component: register, meta: { keepAlive: true } },
+    { path: '/personalManage', component: personalManage, meta: { keepAlive: true } },
 ];
 
 const router = new VueRouter({

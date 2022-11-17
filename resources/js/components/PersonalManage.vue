@@ -4,10 +4,6 @@
             <v-card-title>
                 <span class="headline">商品管理</span>
             </v-card-title>
-            <v-card-title>
-                <v-spacer></v-spacer>
-                <v-btn color="primary" class="lighten-1"> 新增商品 </v-btn>
-            </v-card-title>
             <v-data-table :headers="headers" :items="products" :server-items-length="total" class="elevation-1">
             </v-data-table>
         </v-card>
@@ -44,8 +40,14 @@ export default {
             return this.products.length;
         },
     },
+    created() {
+        axios.get('api/user/loginStatus').then((response) => {
+            // !response.data.status && (location.href = "/#/login");
+            console.log(response.data);
+        });
+    },
     mounted() {
-        axios.get('getAllProducts').then((response) => {
+        axios.get('products/getAllProducts').then((response) => {
             this.products = response.data.products;
         });
     },

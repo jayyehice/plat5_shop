@@ -8,17 +8,16 @@
                     </v-avatar>
                 </v-col>
                 <v-col>
-                    <v-btn v-for="link in links" :key="link" text>
-                        {{ link }}
+                    <v-btn v-for="link in links" :key="link[0]" @click="toProductsPage" text>
+                        {{ link[0] }}
                     </v-btn>
                 </v-col>
                 <v-col cols="2" class="d-flex">
                     <v-btn class="ml-auto" text>
                         <v-icon>mdi-cart-outline</v-icon>
                     </v-btn>
-                    <v-btn text>
-                        <v-icon>mdi-account</v-icon>
-                    </v-btn>
+                    <v-btn v-if="!is_login" to="/login" color="primary">登入</v-btn>
+                    <v-btn v-else to="/" color="grey darken-1">登出</v-btn>
                 </v-col>
             </v-row>
         </v-container>
@@ -27,8 +26,14 @@
 
 <script>
 export default {
+    props:['is_login'],
     data: () => ({
-        links: ['Home', 'Products'],
+        links: [['Products','/#/products']],
     }),
+    methods:{
+        toProductsPage(){
+            location.href = '/#/products';
+        }
+    }
 };
 </script>
