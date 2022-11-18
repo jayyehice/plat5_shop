@@ -8,29 +8,19 @@
                     </v-avatar>
                 </v-col>
                 <v-col>
-                    <v-btn v-for="link in links" :key="link" text>
-                        {{ link }}
+                    <v-btn to="/" plain text>
+                        Products
                     </v-btn>
                 </v-col>
                 <v-col cols="2" class="d-flex">
-                    <v-btn class="ml-auto" text>
+                    <v-btn class="ml-auto" plain text>
                         <v-icon>mdi-cart-outline</v-icon>
                     </v-btn>
-                    <v-btn text>
+                    <v-btn class="mr-auto" to="/personalManage" plain text>
                         <v-icon>mdi-account</v-icon>
                     </v-btn>
-                </v-col>
-                <v-col cols="2" class="d-flex ml-2">
-                    <v-text-field
-                        class="mr-2"
-                        dense
-                        flat
-                        hide-details
-                        rounded
-                        solo-inverted
-                    >
-                    </v-text-field>
-                    <v-btn> 商品搜尋 </v-btn>
+                    <v-btn v-if="!is_login" color="primary" to="/login">登入</v-btn>
+                    <v-btn v-else to="/" color="grey darken-1" @click="logout">登出</v-btn>
                 </v-col>
             </v-row>
         </v-container>
@@ -38,9 +28,14 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
-    data: () => ({
-        links: ['Home', 'Products'],
-    }),
+    props: ['is_login'],
+    methods: {
+        logout() {
+            axios.get('user/logout');
+            location.href = '/';
+        },
+    },
 };
 </script>
