@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Product;
 
-class ProdsTableSeeder extends Seeder
+class ProductsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,7 +14,7 @@ class ProdsTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('products')->insert([
+        $products = [
             [
                 'name'=> 'apple',
                 'description'=> '蘋果',
@@ -30,6 +30,25 @@ class ProdsTableSeeder extends Seeder
                 'description'=> '櫻桃',
                 'price'=>200
             ],
-        ]);
+            [
+                'name'=> 'lemon',
+                'description'=> '檸檬',
+                'price'=>60
+            ],
+            [
+                'name'=> 'cantaloupe',
+                'description'=> '香瓜',
+                'price'=>300
+            ],
+            [
+                'name'=> 'peach',
+                'description'=> '水蜜桃',
+                'price'=>800
+            ]
+        ];
+
+        foreach($products as $product){
+            Product::create($product);
+        }
     }
 }

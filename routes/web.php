@@ -14,7 +14,11 @@ use App\Http\Controllers\ProductsController;
 |
 */
 
-
-Route::get('/getAllProducts', [ProductsController::class, 'getAllProducts']);
+Route::group(['prefix'=>'products'], function(){
+    Route::get('getAllProducts', [ProductsController::class, 'getAllProducts']);
+    Route::get('searchProducts', [ProductsController::class, 'searchProducts']);
+    Route::get('getAllTypes', [ProductsController::class, 'getAllTypes']);
+    Route::get('filterProducts', [ProductsController::class, 'filterProducts']);
+});
 
 Route::view('/', 'index');
