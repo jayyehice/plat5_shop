@@ -73,7 +73,7 @@ export default {
     }),
     mounted() {
         axios
-            .get('getAllProducts')
+            .get('products/getAllProducts')
             .then((response) => (this.products = response.data.products));
 
         //篩選條件

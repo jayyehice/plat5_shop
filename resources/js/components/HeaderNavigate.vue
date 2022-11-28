@@ -8,15 +8,15 @@
                     </v-avatar>
                 </v-col>
                 <v-col>
-                    <v-btn v-for="link in links" :key="link" text>
-                        {{ link }}
+                    <v-btn plain to="/" text>
+                        Products
                     </v-btn>
                 </v-col>
                 <v-col cols="2" class="d-flex">
-                    <v-btn class="ml-auto" text>
+                    <v-btn plain class="ml-auto" text>
                         <v-icon>mdi-cart-outline</v-icon>
                     </v-btn>
-                    <v-btn text>
+                    <v-btn plain to="/manageProducts" text>
                         <v-icon>mdi-account</v-icon>
                     </v-btn>
                 </v-col>
@@ -36,11 +36,3 @@
         </v-container>
     </v-app-bar>
 </template>
-
-<script>
-export default {
-    data: () => ({
-        links: ['Home', 'Products'],
-    }),
-};
-</script>

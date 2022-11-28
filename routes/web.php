@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\ManageProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +15,13 @@ use App\Http\Controllers\ProductsController;
 |
 */
 
+Route::group(['prefix'=>'products'], function(){
+    Route::get('getAllProducts', [ProductsController::class, 'getAllProducts']);
+});
 
-Route::get('/getAllProducts', [ProductsController::class, 'getAllProducts']);
+Route::group(['prefix'=>'manage'], function(){
+    Route::post('addProduct', [ManageProductController::class, 'addProduct']);
+});
 
 Route::view('/', 'index');
+Route::view('/manageProducts', 'index');
