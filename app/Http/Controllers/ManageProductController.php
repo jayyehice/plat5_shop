@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddProductRequest;
-use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 
 use Illuminate\Http\Request;
@@ -16,7 +15,7 @@ class ManageProductController extends Controller
         return ['product' => $product];
     }
 
-    public function updateProduct(UpdateProductRequest $request)
+    public function updateProduct(AddProductRequest $request)
     {
         $updated = Product::findOrFail(request('id'))->update(request()->all());
         return ['updated' => $updated];

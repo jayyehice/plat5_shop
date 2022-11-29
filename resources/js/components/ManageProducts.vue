@@ -140,66 +140,6 @@ export default {
         },
         close() {
             this.dialog = false;
-            this.$nextTick(() => {
-                this.edited_item = this.$options.data().edited_item;
-                this.$refs.form.resetValidation();
-                this.name_error = '';
-                this.description_error = '';
-                this.price_error = '';
-                this.edited_index = -1;
-            });
-        },
-        save() {
-            if (this.edited_index > -1) {
-                this.$refs.form.validate() && axios.put('manage/updateProduct', this.edited_item)
-                    .then((response) => {
-                        if (response.data.updated) {
-                            Object.assign(this.products[this.edited_index], this.edited_item);
-                            this.close();
-                            this.snackbar_text = '修改成功';
-                            this.snackbar_color = 'primary';
-                            this.snackbar = true;
-                        }
-                    })
-                    .catch((error) => {
-                        if ('errors' in error.response.data) {
-                            this.name_error = error.response.data.errors.name;
-                            this.description_error = error.response.data.errors.description;
-                            this.price_error = error.response.data.errors.price;
-                        } else {
-                            this.snackbar_text = '修改失敗 - ' + error;
-                            this.snackbar_color = 'error';
-                            this.snackbar = true;
-                        }
-                    });
-            } else {
-                this.$refs.form.validate() && axios.post('manage/addProduct', this.edited_item)
-                    .then((response) => {
-                        this.products.push(response.data.product);
-                        this.close();
-                        this.snackbar_text = '新增成功';
-                        this.snackbar_color = 'primary';
-                        this.snackbar = true;
-                    })
-                    .catch((error) => {
-                        if ('errors' in error.response.data) {
-                            this.name_error = error.response.data.errors.name;
-                            this.description_error = error.response.data.errors.description;
-                            this.price_error = error.response.data.errors.price;
-                        } else {
-                            this.snackbar_text = '新增失敗 - ' + error;
-                            this.snackbar_color = 'error';
-                            this.snackbar = true;
-                        }
-                    });
-            }
-        },
-        deleteItem(item) {
-            this.edited_index = this.products.indexOf(item);
-            this.edited_item = Object.assign({}, item);
-            this.delete_dialog = true;
-        },
-        closeDelete() {
             this.delete_dialog = false;
             this.$nextTick(() => {
                 this.edited_item = this.$options.data().edited_item;
@@ -209,6 +149,38 @@ export default {
                 this.price_error = '';
                 this.edited_index = -1;
             });
+        },
+        save() {
+            let hint = (this.edited_index > -1 ? '修改' : '新增');
+
+            this.$refs.form.validate() && axios({
+                'method': (this.edited_index > -1 ? 'put' : 'post'),
+                'url': (this.edited_index > -1 ? 'manage/updateProduct' : 'manage/addProduct'),
+                'data': this.edited_item
+            })
+                .then((response) => {
+                    this.edited_index > -1 ? Object.assign(this.products[this.edited_index], this.edited_item) : this.products.push(response.data.product);
+                    this.close();
+                    this.snackbar_text = hint + '成功';
+                    this.snackbar_color = 'primary';
+                    this.snackbar = true;
+                })
+                .catch((error) => {
+                    if ('errors' in error.response.data) {
+                        this.name_error = error.response.data.errors.name;
+                        this.description_error = error.response.data.errors.description;
+                        this.price_error = error.response.data.errors.price;
+                    } else {
+                        this.snackbar_text = hint + '失敗 - ' + error;
+                        this.snackbar_color = 'error';
+                        this.snackbar = true;
+                    }
+                });
+        },
+        deleteItem(item) {
+            this.edited_index = this.products.indexOf(item);
+            this.edited_item = Object.assign({}, item);
+            this.delete_dialog = true;
         },
         deleteItemConfirm() {
             axios.delete('manage/deleteProduct/' + this.edited_item.id)
@@ -238,7 +210,7 @@ export default {
             value || this.close();
         },
         delete_dialog(value) {
-            value || this.closeDelete();
+            value || this.close();
         },
     },
     mounted() {
