@@ -25,7 +25,7 @@
                                 </template>
                                 <v-card>
                                     <v-card-title>
-                                        新增商品
+                                        {{dialogTitle}}
                                     </v-card-title>
                                     <v-card-text>
                                         <v-form ref="form">
@@ -58,7 +58,29 @@
                                     </v-card-actions>
                                 </v-card>
                             </v-dialog>
+                            <!-- 確認移除彈窗 -->
+                            <v-dialog v-model="delete_dialog" max-width="500px">
+                                <v-card>
+                                    <v-card-title class="text-h5">您是否確認要刪除此商品?
+                                    </v-card-title>
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn color="blue darken-1" text @click="delete_dialog = false">Cancel</v-btn>
+                                        <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                                        <v-spacer></v-spacer>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
+                            <!-- 確認移除彈窗end -->
                         </v-toolbar>
+                    </template>
+                    <template v-slot:item.actions="{ item }">
+                        <v-icon small class="mr-2" @click="editItem(item)">
+                            mdi-pencil
+                        </v-icon>
+                        <v-icon small @click="deleteItem(item)">
+                            mdi-delete
+                        </v-icon>
                     </template>
                 </v-data-table>
             </v-card-text>
@@ -117,9 +139,16 @@ export default {
             snackbar: false,
             snackbar_text: '',
             snackbar_color: '',
+            edited_index: -1,//-1為新增商品狀態，其他數字代表在修改或刪除商品狀態
+            delete_dialog: false,
         };
     },
     methods: {
+        editItem(item) {
+            this.edited_index = this.products.indexOf(item);
+            this.edited_item = Object.assign({}, item);
+            this.dialog = true;
+        },
         close() {
             this.dialog = false;
             this.$nextTick(() => {
@@ -128,33 +157,99 @@ export default {
                 this.name_error = '';
                 this.description_error = '';
                 this.price_error = '';
+                this.edited_index = -1;
             });
         },
         save() {
-            this.$refs.form.validate() && axios.post('manage/addProduct', this.edited_item)
+            if (this.edited_index > -1) {
+                this.$refs.form.validate() && axios.put('manage/updateProduct', this.edited_item)
+                    .then((response) => {
+                        if (response.data.updated) {
+                            Object.assign(this.products[this.edited_index], this.edited_item);
+                            this.close();
+                            this.snackbar_text = '修改成功';
+                            this.snackbar_color = 'primary';
+                            this.snackbar = true;
+                        }
+                    })
+                    .catch((error) => {
+                        if ('errors' in error.response.data) {
+                            this.name_error = error.response.data.errors.name;
+                            this.description_error = error.response.data.errors.description;
+                            this.price_error = error.response.data.errors.price;
+                        } else {
+                            this.snackbar_text = '修改失敗 - ' + error;
+                            this.snackbar_color = 'error';
+                            this.snackbar = true;
+                        }
+                    });
+            } else {
+                this.$refs.form.validate() && axios.post('manage/addProduct', this.edited_item)
+                    .then((response) => {
+                        this.products.push(response.data.product);
+                        this.close();
+                        this.snackbar_text = '新增成功';
+                        this.snackbar_color = 'primary';
+                        this.snackbar = true;
+                    })
+                    .catch((error) => {
+                        if ('errors' in error.response.data) {
+                            this.name_error = error.response.data.errors.name;
+                            this.description_error = error.response.data.errors.description;
+                            this.price_error = error.response.data.errors.price;
+                        } else {
+                            this.snackbar_text = '新增失敗 - ' + error;
+                            this.snackbar_color = 'error';
+                            this.snackbar = true;
+                        }
+                    });
+            }
+        },
+        deleteItem(item) {
+            this.edited_index = this.products.indexOf(item);
+            this.edited_item = Object.assign({}, item);
+            this.delete_dialog = true;
+        },
+        closeDelete() {
+            this.delete_dialog = false;
+            this.$nextTick(() => {
+                this.edited_item = this.$options.data().edited_item;
+                ('form' in this.$refs) && this.$refs.form.resetValidation();
+                this.name_error = '';
+                this.description_error = '';
+                this.price_error = '';
+                this.edited_index = -1;
+            });
+        },
+        deleteItemConfirm() {
+            axios.delete('manage/deleteProduct/' + this.edited_item.id)
                 .then((response) => {
-                    this.products.push(response.data.product);
-                    this.close();
-                    this.snackbar_text = '新增成功';
-                    this.snackbar_color = 'primary';
-                    this.snackbar = true;
-                })
-                .catch((error) => {
-                    if ('errors' in error.response.data) {
-                        this.name_error = error.response.data.errors.name;
-                        this.description_error = error.response.data.errors.description;
-                        this.price_error = error.response.data.errors.price;
-                    } else {
-                        this.snackbar_text = '新增失敗 - ' + error;
-                        this.snackbar_color = 'error';
+                    if (response.data.deleted) {
+                        this.products.splice(this.edited_index, 1);
+                        this.closeDelete();
+                        this.snackbar_text = '刪除成功';
+                        this.snackbar_color = 'primary';
                         this.snackbar = true;
                     }
+                })
+                .catch((error) => {
+                    this.snackbar_text = '刪除失敗 - ' + error;
+                    this.snackbar_color = 'error';
+                    this.snackbar = true;
                 });
+        },
+    },
+    computed: {
+        dialogTitle() {
+            return this.edited_index === -1 ? '新增商品' : '修改商品';
         },
     },
     watch: {
         dialog(value) {
             value || this.close();
+        },
+        delete_dialog(value) {
+            value || this.closeDelete();
         },
     },
     mounted() {
