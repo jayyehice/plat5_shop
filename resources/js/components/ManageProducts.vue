@@ -58,16 +58,13 @@
                                     </v-card-actions>
                                 </v-card>
                             </v-dialog>
-                            <deleteDialog :delete_dialog="delete_dialog" @close-delete="delete_dialog = false" @comfirm="deleteItemConfirm"></deleteDialog>
                         </v-toolbar>
                     </template>
                     <template v-slot:item.actions="{ item }">
                         <v-icon small class="mr-2" @click="editItem(item)">
                             mdi-pencil
                         </v-icon>
-                        <v-icon small @click="deleteItem(item)">
-                            mdi-delete
-                        </v-icon>
+                        <deleteDialog :item="item" @delete_result="deleteResult"></deleteDialog>
                     </template>
                 </v-data-table>
             </v-card-text>
@@ -129,7 +126,6 @@ export default {
             snackbar_text: '',
             snackbar_color: '',
             edited_index: -1,//-1為新增商品狀態，其他數字代表在修改或刪除商品狀態
-            delete_dialog: false,
         };
     },
     methods: {
@@ -140,10 +136,9 @@ export default {
         },
         close() {
             this.dialog = false;
-            this.delete_dialog = false;
             this.$nextTick(() => {
                 this.edited_item = this.$options.data().edited_item;
-                ('form' in this.$refs) && this.$refs.form.resetValidation();
+                this.$refs.form.resetValidation();
                 this.name_error = '';
                 this.description_error = '';
                 this.price_error = '';
@@ -177,27 +172,17 @@ export default {
                     }
                 });
         },
-        deleteItem(item) {
-            this.edited_index = this.products.indexOf(item);
-            this.edited_item = Object.assign({}, item);
-            this.delete_dialog = true;
-        },
-        deleteItemConfirm() {
-            axios.delete('manage/deleteProduct/' + this.edited_item.id)
-                .then((response) => {
-                    if (response.data.deleted) {
-                        this.products.splice(this.edited_index, 1);
-                        this.closeDelete();
-                        this.snackbar_text = '刪除成功';
-                        this.snackbar_color = 'primary';
-                        this.snackbar = true;
-                    }
-                })
-                .catch((error) => {
-                    this.snackbar_text = '刪除失敗 - ' + error;
-                    this.snackbar_color = 'error';
-                    this.snackbar = true;
-                });
+        deleteResult(result) {
+            if (result.success) {
+                this.products.splice(this.products.indexOf(result.item), 1);
+                this.snackbar_text = '刪除成功';
+                this.snackbar_color = 'primary';
+                this.snackbar = true;
+            } else {
+                this.snackbar_text = '刪除失敗 - ' + result.error;
+                this.snackbar_color = 'error';
+                this.snackbar = true;
+            }
         },
     },
     computed: {
@@ -208,10 +193,7 @@ export default {
     watch: {
         dialog(value) {
             value || this.close();
-        },
-        delete_dialog(value) {
-            value || this.close();
-        },
+        }
     },
     mounted() {
         axios.get('products/getAllProducts')
