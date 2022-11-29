@@ -58,20 +58,7 @@
                                     </v-card-actions>
                                 </v-card>
                             </v-dialog>
-                            <!-- 確認移除彈窗 -->
-                            <v-dialog v-model="delete_dialog" max-width="500px">
-                                <v-card>
-                                    <v-card-title class="text-h5">您是否確認要刪除此商品?
-                                    </v-card-title>
-                                    <v-card-actions>
-                                        <v-spacer></v-spacer>
-                                        <v-btn color="blue darken-1" text @click="delete_dialog = false">Cancel</v-btn>
-                                        <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
-                                        <v-spacer></v-spacer>
-                                    </v-card-actions>
-                                </v-card>
-                            </v-dialog>
-                            <!-- 確認移除彈窗end -->
+                            <deleteDialog :delete_dialog="delete_dialog" @close-delete="delete_dialog = false" @comfirm="deleteItemConfirm"></deleteDialog>
                         </v-toolbar>
                     </template>
                     <template v-slot:item.actions="{ item }">
@@ -90,8 +77,10 @@
 
 <script>
 import axios from 'axios';
+import deleteDialog from './DeleteDialog.vue';
 
 export default {
+    components: { deleteDialog },
     data() {
         return {
             dialog: false,
