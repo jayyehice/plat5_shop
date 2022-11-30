@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AddProductRequest;
 use App\Models\Product;
-
 use Illuminate\Http\Request;
 
 class ManageProductController extends Controller
@@ -21,9 +20,9 @@ class ManageProductController extends Controller
         return ['updated' => $updated];
     }
 
-    public function deleteProduct($id)
+    public function deleteProduct(Product $product)
     {
-        $deleted = Product::findOrFail($id)->delete();
+        $deleted = $product->delete();
         return ['deleted' => $deleted];
     }
 }
