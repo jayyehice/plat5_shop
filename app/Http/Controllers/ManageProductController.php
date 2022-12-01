@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AddProductRequest;
 use App\Models\Product;
-use Illuminate\Http\Request;
 
 class ManageProductController extends Controller
 {
@@ -24,5 +23,11 @@ class ManageProductController extends Controller
     {
         $deleted = $product->delete();
         return ['deleted' => $deleted];
+    }
+
+    public function updateActive(Product $product)
+    {
+        $updated = $product->update(['active' => request('active')]);
+        return ['updated' => $updated];
     }
 }

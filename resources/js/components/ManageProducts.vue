@@ -66,6 +66,9 @@
                         </v-icon>
                         <deleteDialog :item="item" @delete_result="deleteResult"></deleteDialog>
                     </template>
+                    <template v-slot:item.active="{ item }">
+                        <changeActive :item="item" @active_result="activeResult"></changeActive>
+                    </template>
                 </v-data-table>
             </v-card-text>
         </v-card>
@@ -75,9 +78,10 @@
 <script>
 import axios from 'axios';
 import deleteDialog from './DeleteDialog.vue';
+import changeActive from './ChangeActive.vue';
 
 export default {
-    components: { deleteDialog },
+    components: { deleteDialog, changeActive },
     data() {
         return {
             dialog: false,
@@ -103,6 +107,10 @@ export default {
             products: [],
             headers: [
                 {
+                    text: '上/下架',
+                    value: 'active',
+                },
+                {
                     text: 'name',
                     value: 'name',
                     width: '30%',
@@ -115,7 +123,7 @@ export default {
                 {
                     text: 'price',
                     value: 'price',
-                    width: '30%',
+                    width: '20%',
                 },
                 {
                     text: 'actions',
@@ -184,6 +192,18 @@ export default {
                 this.snackbar = true;
             }
         },
+        activeResult(result) {
+            if (result.success) {
+                this.snackbar_text = result.hint;
+                this.snackbar_color = 'primary';
+                this.snackbar = true;
+                result.item.active = !result.item.active;
+            } else {
+                this.snackbar_text = result.hint;
+                this.snackbar_color = 'error';
+                this.snackbar = true;
+            }
+        }
     },
     computed: {
         dialogTitle() {

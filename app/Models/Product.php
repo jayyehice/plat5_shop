@@ -12,6 +12,16 @@ class Product extends Model
     protected $fillable = [
         'name',
         'description',
-        'price'
+        'price',
+        'active',
     ];
+
+    protected $casts = [
+        'active' => 'boolean',
+    ];
+
+    public function scopeActiveProducts($query)
+    {
+        return $query->where('active', 1);
+    }
 }
