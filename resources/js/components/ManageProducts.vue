@@ -44,6 +44,14 @@
                                                         </v-text-field>
                                                     </v-col>
                                                 </v-row>
+                                                <v-row>
+                                                    <v-col cols="6">
+                                                        <v-file-input accept="image/png, image/jpeg, image/bmp" placeholder="Pick an avatar" prepend-icon="mdi-camera" label="商品圖片" v-model="edited_photo" required></v-file-input>
+                                                    </v-col>
+                                                    <v-col cols="6">
+                                                        <v-btn @click="uploadItemPicture">upload</v-btn>
+                                                    </v-col>
+                                                </v-row>
                                             </v-container>
                                         </v-form>
                                     </v-card-text>
@@ -184,6 +192,13 @@ export default {
                 this.snackbar = true;
             }
         },
+        uploadItemPicture() {
+            let data = new FormData;
+            data.append('photo', this.edited_photo);
+            axios.post('manageProduct/uploadProductPicture', data).then((response) => {
+                console.log(response.data);
+            });
+        }
     },
     computed: {
         dialogTitle() {

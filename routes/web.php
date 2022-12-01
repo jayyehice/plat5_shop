@@ -23,6 +23,7 @@ Route::group(['prefix'=>'manage'], function(){
     Route::post('addProduct', [ManageProductController::class, 'addProduct']);
     Route::put('updateProduct', [ManageProductController::class, 'updateProduct']);
     Route::delete('deleteProduct/{product}', [ManageProductController::class, 'deleteProduct']);
+    Route::post('uploadProductPicture', [ManageProductController::class, 'uploadProductPicture']);
 });
 
 Route::view('/', 'index');
