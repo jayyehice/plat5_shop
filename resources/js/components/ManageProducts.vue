@@ -44,11 +44,11 @@
                                                         </v-text-field>
                                                     </v-col>
                                                 </v-row>
-                                                <v-row>
-                                                    <v-col cols="6">
-                                                        <v-file-input accept="image/png, image/jpeg, image/bmp" placeholder="Pick an avatar" prepend-icon="mdi-camera" label="商品圖片" v-model="edited_photo" required></v-file-input>
+                                                <v-row class="align-center">
+                                                    <v-col cols="8">
+                                                        <v-file-input accept="image/png, image/jpeg, image/bmp" placeholder="Pick an avatar" prepend-icon="mdi-camera" label="photo" v-model="item_photo" required></v-file-input>
                                                     </v-col>
-                                                    <v-col cols="6">
+                                                    <v-col cols="4">
                                                         <v-btn @click="uploadItemPicture">upload</v-btn>
                                                     </v-col>
                                                 </v-row>
@@ -88,7 +88,7 @@ export default {
     components: { deleteDialog },
     data() {
         return {
-            dialog: false,
+            dialog: true,
             name_rules: [
                 v => !!v || '未填寫商品名稱',
             ],
@@ -134,6 +134,7 @@ export default {
             snackbar_text: '',
             snackbar_color: '',
             edited_index: -1,//-1為新增商品狀態，其他數字代表在修改或刪除商品狀態
+            item_photo: null,
         };
     },
     methods: {
@@ -194,7 +195,7 @@ export default {
         },
         uploadItemPicture() {
             let data = new FormData;
-            data.append('photo', this.edited_photo);
+            data.append('photo', this.item_photo);
             axios.post('manageProduct/uploadProductPicture', data).then((response) => {
                 console.log(response.data);
             });
