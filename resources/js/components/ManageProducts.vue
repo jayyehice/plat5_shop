@@ -67,7 +67,7 @@
                         <deleteDialog :item="item" @delete_result="deleteResult"></deleteDialog>
                     </template>
                     <template v-slot:item.active="{ item }">
-                        <changeActive :item="item" @active_result="activeResult"></changeActive>
+                        <changeActiveDialog :item="item" @active_result="activeResult"></changeActiveDialog>
                     </template>
                 </v-data-table>
             </v-card-text>
@@ -78,10 +78,10 @@
 <script>
 import axios from 'axios';
 import deleteDialog from './DeleteDialog.vue';
-import changeActive from './ChangeActive.vue';
+import changeActiveDialog from './ChangeActiveDialog.vue';
 
 export default {
-    components: { deleteDialog, changeActive },
+    components: { deleteDialog, changeActiveDialog },
     data() {
         return {
             dialog: false,
