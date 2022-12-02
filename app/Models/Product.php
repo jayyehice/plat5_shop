@@ -22,6 +22,6 @@ class Product extends Model
 
     public function scopeActiveProducts($query)
     {
-        return $query->where('active', 1);
+        return $query->where('active', true);
     }
 }

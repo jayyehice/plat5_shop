@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->string('description');
             $table->integer('price');
-            $table->integer('active')->default(1);
+            $table->boolean('active')->default(true);
         });
     }
 
