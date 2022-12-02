@@ -7,6 +7,12 @@ use App\Models\Product;
 
 class ManageProductController extends Controller
 {
+    public function getAllProducts()
+    {
+        $products = Product::all();
+        return ['products' => $products];
+    }
+
     public function addProduct(AddProductRequest $request)
     {
         $product = Product::create($request->all());

@@ -216,7 +216,7 @@ export default {
         }
     },
     mounted() {
-        axios.get('products/getAllProducts')
+        axios.get('manage/getAllProducts')
             .then((response) => {
                 this.products = response.data.products;
             });

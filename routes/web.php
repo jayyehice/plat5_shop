@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::group(['prefix' => 'products'], function () {
-    Route::get('getAllProducts', [ProductsController::class, 'getAllProducts']);
     Route::get('getActiveProducts', [ProductsController::class, 'getActiveProducts']);
 });
 
 Route::group(['prefix' => 'manage'], function () {
+    Route::get('getAllProducts', [ManageProductController::class, 'getAllProducts']);
     Route::post('addProduct', [ManageProductController::class, 'addProduct']);
     Route::put('updateProduct', [ManageProductController::class, 'updateProduct']);
     Route::delete('deleteProduct/{product}', [ManageProductController::class, 'deleteProduct']);
